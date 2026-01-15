@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/drawer";
 import {
   Field,
+  FieldContent,
   FieldDescription,
   FieldError,
   FieldLabel,
@@ -30,121 +31,123 @@ import { habitsAtom } from "@/components/state/state";
 import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import { Input } from "../ui/input";
-import { set } from "date-fns";
+import { habitType } from "../types/types";
+import { Switch } from "@/components/ui/switch";
 
 const Today = () => {
   const [habits, setHabits] = useAtom(habitsAtom);
-
   const [open, setOpen] = useState(false);
-  const [habit, setHabit] = useState("");
   const [alert, setAlert] = useState("");
+  const [editHabit, setEditHabit] = useState<habitType>();
 
   const submit = () => {
-    if (habit.trim() === "") {
-      setAlert("Habit cannot be empty");
+    if (alert) {
       return;
     }
     setHabits((prev) => {
       return prev.map((oldHabit) => {
-        if (oldHabit.name === habit) {
-          return { ...oldHabit, name: habit };
-        }
-        return oldHabit;
+        if (oldHabit.id === editHabit?.id) {
+          return { ...oldHabit, name: editHabit.name, daily: editHabit.daily };
+        } else return oldHabit;
       });
     });
-    setHabit("");
     setOpen(false);
   };
 
-  useEffect(() => {
-    if (habit.trim() !== "") {
-      setAlert("");
-    }
-  }, [habit]);
-
   return (
     <TabsContent value="today" className="space-y-4">
-      <Drawer open={open} onOpenChange={setOpen}>
-        <DrawerTrigger asChild>
-          <Button>
-            <Plus className="h-4 w-4 mr-2" /> Add Habit
-          </Button>
-        </DrawerTrigger>
-        <DrawerContent className="flex items-center justify-center min-w-sm">
-          <div className="min-w-sm">
-            <DrawerHeader>
-              <DrawerTitle>Edit Habit</DrawerTitle>
-              <DrawerDescription asChild>
-                <Field>
-                  <FieldLabel htmlFor="habit-name" asChild>
-                    Label
-                  </FieldLabel>
-                  <Input
-                    id="habit-name"
-                    autoComplete="off"
-                    placeholder="Drink Water"
-                    value={habit}
-                    onChange={(e) => {
-                      setHabit(e.target.value);
-                    }}
-                  />
-                  <FieldDescription>
-                    {/* Optional helper text. */}
-                  </FieldDescription>
-                  <FieldError>{alert}</FieldError>
-                </Field>
-              </DrawerDescription>
-            </DrawerHeader>
-            <DrawerFooter>
-              <Button onClick={() => submit()}>Submit</Button>
-              <DrawerClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DrawerClose>
-            </DrawerFooter>
-          </div>
-        </DrawerContent>
-      </Drawer>
       <Card className="shadow-sm">
         <CardHeader>
           <CardTitle>Today's Habits</CardTitle>
           <CardDescription>Mark habits as you complete them</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          {habits.map((habit, index) => (
+          {habits.map((habit) => (
             <div
               key={habit.id}
               className="flex items-center justify-between rounded-lg border p-3 hover:bg-muted transition"
+              onClick={() => {
+                setHabits(() => {
+                  return habits.map((oldHabit) => {
+                    if (oldHabit.id === habit.id) {
+                      return {
+                        ...oldHabit,
+                        completed: !oldHabit.completed,
+                      };
+                    }
+                    return oldHabit;
+                  });
+                });
+              }}
             >
               <div className="flex items-center gap-3">
-                <Checkbox
-                  checked={habit.completed}
-                  onCheckedChange={() => {
-                    setHabits(() => {
-                      return habits.map((oldHabit) => {
-                        if (oldHabit.id === habit.id) {
-                          return {
-                            ...oldHabit,
-                            completed: !oldHabit.completed,
-                          };
-                        }
-                        return oldHabit;
-                      });
-                    });
-                  }}
-                />
+                <Checkbox checked={habit.completed} />
                 <span className="font-medium">{habit.name}</span>
-                {index === 0 && <Badge>Daily</Badge>}
+                {habit.daily && <Badge>Daily</Badge>}
               </div>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => {
-                  setOpen(true);
-                  setHabit(habit.name);
-                }}
-              >
-                Edit
-              </Button>
+
+              <Drawer open={open} onOpenChange={setOpen}>
+                <DrawerTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setEditHabit(habit)}
+                  >
+                    Edit
+                  </Button>
+                </DrawerTrigger>
+                <DrawerContent className="flex items-center justify-center min-w-sm">
+                  <div className="min-w-sm">
+                    <DrawerHeader>
+                      <DrawerTitle>Edit Habit</DrawerTitle>
+                      <DrawerDescription asChild>
+                        <Field>
+                          <FieldLabel htmlFor="habit-name" asChild>
+                            Label
+                          </FieldLabel>
+                          <Input
+                            id="habit-name"
+                            autoComplete="off"
+                            placeholder="Drink Water"
+                            value={editHabit?.name}
+                            onChange={(e) => {
+                              setEditHabit((prev) => {
+                                if (!prev) return prev;
+                                return { ...prev, name: e.target.value };
+                              });
+                            }}
+                          />
+                          <FieldDescription>
+                            {/* Optional helper text. */}
+                          </FieldDescription>
+                          <FieldError>{alert}</FieldError>
+                        </Field>
+                      </DrawerDescription>
+                      <Field className="px-1" orientation="horizontal">
+                        <FieldContent>
+                          <FieldLabel htmlFor="daily">Daily</FieldLabel>
+                        </FieldContent>
+                        <Switch
+                          id="daily"
+                          checked={editHabit?.daily}
+                          onCheckedChange={() =>
+                            setEditHabit((prev) => {
+                              if (!prev) return prev;
+                              return { ...prev, daily: !prev.daily };
+                            })
+                          }
+                        />
+                      </Field>
+                    </DrawerHeader>
+                    <DrawerFooter>
+                      <Button onClick={() => submit()}>Submit</Button>
+                      <DrawerClose asChild>
+                        <Button variant="outline">Cancel</Button>
+                      </DrawerClose>
+                    </DrawerFooter>
+                  </div>
+                </DrawerContent>
+              </Drawer>
             </div>
           ))}
         </CardContent>

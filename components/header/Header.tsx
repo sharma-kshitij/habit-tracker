@@ -19,7 +19,9 @@ import {
   FieldDescription,
   FieldError,
   FieldLabel,
+  FieldContent,
 } from "@/components/ui/field";
+import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { useTheme } from "next-themes";
 import { useState } from "react";
@@ -32,6 +34,7 @@ const Header = () => {
   const setHabits = useSetAtom(habitsAtom);
   const [open, setOpen] = useState(false);
   const [alert, setAlert] = useState("");
+  const [daily, setDaily] = useState(false);
 
   const submit = () => {
     if (habit.trim() === "") {
@@ -40,7 +43,12 @@ const Header = () => {
     }
     setHabits((prev) => [
       ...prev,
-      { id: prev[prev.length - 1].id + 1, name: habit, completed: false },
+      {
+        id: prev[prev.length - 1].id + 1,
+        name: habit,
+        completed: false,
+        daily: daily,
+      },
     ]);
     setHabit("");
     setOpen(false);
@@ -64,26 +72,34 @@ const Header = () => {
               <div className="min-w-sm">
                 <DrawerHeader>
                   <DrawerTitle>Add Habit</DrawerTitle>
-                  <DrawerDescription asChild>
-                    <Field>
-                      <FieldLabel htmlFor="habit-name" asChild>
-                        Label
-                      </FieldLabel>
-                      <Input
-                        id="habit-name"
-                        autoComplete="off"
-                        placeholder="Drink Water"
-                        value={habit}
-                        onChange={(e) => {
-                          setHabit(e.target.value);
-                        }}
-                      />
-                      <FieldDescription>
-                        {/* Optional helper text. */}
-                      </FieldDescription>
-                      <FieldError>{alert}</FieldError>
-                    </Field>
-                  </DrawerDescription>
+                  <Field>
+                    <FieldLabel htmlFor="habit-name" asChild>
+                      Label
+                    </FieldLabel>
+                    <Input
+                      id="habit-name"
+                      autoComplete="off"
+                      placeholder="Drink Water"
+                      value={habit}
+                      onChange={(e) => {
+                        setHabit(e.target.value);
+                      }}
+                    />
+                    <FieldDescription>
+                      {/* Optional helper text. */}
+                    </FieldDescription>
+                    <FieldError>{alert}</FieldError>
+                  </Field>
+                  <Field className="px-1" orientation="horizontal">
+                    <FieldContent>
+                      <FieldLabel htmlFor="daily">Daily</FieldLabel>
+                    </FieldContent>
+                    <Switch
+                      id="daily"
+                      checked={daily}
+                      onCheckedChange={() => setDaily(!daily)}
+                    />
+                  </Field>
                 </DrawerHeader>
                 <DrawerFooter>
                   <Button onClick={() => submit()}>Submit</Button>
