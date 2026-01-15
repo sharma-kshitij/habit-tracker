@@ -50,7 +50,12 @@ export default function HabitTrackerHighFidelity() {
               <CardTitle>{habits.length}</CardTitle>
             </CardHeader>
             <CardContent>
-              <Badge variant="secondary">On Track</Badge>
+              <Badge
+                className="bg-green-700 flex items-center justify-center text-white"
+                variant="secondary"
+              >
+                On Track
+              </Badge>
             </CardContent>
           </Card>
 
@@ -58,8 +63,9 @@ export default function HabitTrackerHighFidelity() {
             <CardHeader className="flex flex-row items-center gap-2">
               <Flame className="h-5 w-5 text-orange-500" />
               <div>
-                <CardDescription>Current Streak</CardDescription>
-                <CardTitle>12 Days</CardTitle>
+                <CardTitle>Coming Soon</CardTitle>
+                {/* <CardDescription>Current Streak</CardDescription>
+                <CardTitle>12 Days</CardTitle> */}
               </div>
             </CardHeader>
           </Card>
@@ -78,7 +84,8 @@ export default function HabitTrackerHighFidelity() {
 
           {/* Calendar Tab */}
           <TabsContent value="calendar">
-            <Card className="shadow-sm">
+            <CardTitle>Coming Soon</CardTitle>
+            {/* <Card className="shadow-sm">
               <CardHeader>
                 <CardTitle>Habit Calendar</CardTitle>
                 <CardDescription>Track consistency over time</CardDescription>
@@ -86,12 +93,13 @@ export default function HabitTrackerHighFidelity() {
               <CardContent className="flex justify-center">
                 <Calendar />
               </CardContent>
-            </Card>
+            </Card> */}
           </TabsContent>
 
           {/* Stats Tab */}
           <TabsContent value="stats">
-            <Card className="shadow-sm">
+            <CardTitle>Coming Soon</CardTitle>
+            {/* <Card className="shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle>Analytics</CardTitle>
@@ -105,7 +113,7 @@ export default function HabitTrackerHighFidelity() {
                   Charts & Insights (Recharts)
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
           </TabsContent>
         </Tabs>
       </div>
