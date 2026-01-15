@@ -41,7 +41,9 @@ const Today = () => {
   const [editHabit, setEditHabit] = useState<habitType>();
 
   const submit = () => {
-    if (alert) {
+    console.log(editHabit);
+    if (editHabit?.name.trim() === "") {
+      setAlert("Habit cannot be empty");
       return;
     }
     setHabits((prev) => {
@@ -54,8 +56,62 @@ const Today = () => {
     setOpen(false);
   };
 
+  useEffect(() => {
+    if (editHabit?.name.trim() !== "") {
+      setAlert("");
+    }
+  }, [editHabit]);
+
   return (
     <TabsContent value="today" className="space-y-4">
+      <Drawer open={open} onOpenChange={setOpen}>
+        <DrawerContent className="flex items-center justify-center min-w-sm">
+          <div className="min-w-sm">
+            <DrawerHeader>
+              <DrawerTitle>Add Habit</DrawerTitle>
+              <Field>
+                <FieldLabel htmlFor="habit-name" asChild>
+                  Label
+                </FieldLabel>
+                <Input
+                  id="habit-name"
+                  autoComplete="off"
+                  placeholder="Drink Water"
+                  value={editHabit?.name}
+                  onChange={(e) => {
+                    setEditHabit({
+                      ...editHabit,
+                      name: e.target.value,
+                    } as habitType);
+                  }}
+                />
+                <FieldDescription>
+                  {/* Optional helper text. */}
+                </FieldDescription>
+                <FieldError>{alert}</FieldError>
+              </Field>
+              <Field className="px-1" orientation="horizontal">
+                <FieldContent>
+                  <FieldLabel htmlFor="daily">Daily</FieldLabel>
+                </FieldContent>
+                <Switch
+                  id="daily"
+                  checked={editHabit?.daily}
+                  onCheckedChange={() =>
+                    setEditHabit({ ...editHabit, daily: !editHabit?.daily } as habitType)
+                  }
+                />
+              </Field>
+            </DrawerHeader>
+            <DrawerFooter>
+              <Button onClick={() => submit()}>Submit</Button>
+              <DrawerClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </div>
+        </DrawerContent>
+      </Drawer>
       <Card className="shadow-sm">
         <CardHeader>
           <CardTitle>Today's Habits</CardTitle>
@@ -67,8 +123,8 @@ const Today = () => {
               key={habit.id}
               className="flex items-center justify-between rounded-lg border p-3 hover:bg-muted transition"
               onClick={() => {
-                setHabits(() => {
-                  return habits.map((oldHabit) => {
+                setHabits((prev) => {
+                  return prev.map((oldHabit) => {
                     if (oldHabit.id === habit.id) {
                       return {
                         ...oldHabit,
@@ -85,69 +141,17 @@ const Today = () => {
                 <span className="font-medium">{habit.name}</span>
                 {habit.daily && <Badge>Daily</Badge>}
               </div>
-
-              <Drawer open={open} onOpenChange={setOpen}>
-                <DrawerTrigger asChild>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setEditHabit(habit)}
-                  >
-                    Edit
-                  </Button>
-                </DrawerTrigger>
-                <DrawerContent className="flex items-center justify-center min-w-sm">
-                  <div className="min-w-sm">
-                    <DrawerHeader>
-                      <DrawerTitle>Edit Habit</DrawerTitle>
-                      <DrawerDescription asChild>
-                        <Field>
-                          <FieldLabel htmlFor="habit-name" asChild>
-                            Label
-                          </FieldLabel>
-                          <Input
-                            id="habit-name"
-                            autoComplete="off"
-                            placeholder="Drink Water"
-                            value={editHabit?.name}
-                            onChange={(e) => {
-                              setEditHabit((prev) => {
-                                if (!prev) return prev;
-                                return { ...prev, name: e.target.value };
-                              });
-                            }}
-                          />
-                          <FieldDescription>
-                            {/* Optional helper text. */}
-                          </FieldDescription>
-                          <FieldError>{alert}</FieldError>
-                        </Field>
-                      </DrawerDescription>
-                      <Field className="px-1" orientation="horizontal">
-                        <FieldContent>
-                          <FieldLabel htmlFor="daily">Daily</FieldLabel>
-                        </FieldContent>
-                        <Switch
-                          id="daily"
-                          checked={editHabit?.daily}
-                          onCheckedChange={() =>
-                            setEditHabit((prev) => {
-                              if (!prev) return prev;
-                              return { ...prev, daily: !prev.daily };
-                            })
-                          }
-                        />
-                      </Field>
-                    </DrawerHeader>
-                    <DrawerFooter>
-                      <Button onClick={() => submit()}>Submit</Button>
-                      <DrawerClose asChild>
-                        <Button variant="outline">Cancel</Button>
-                      </DrawerClose>
-                    </DrawerFooter>
-                  </div>
-                </DrawerContent>
-              </Drawer>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditHabit(habit);
+                  setOpen(true);
+                }}
+              >
+                Edit
+              </Button>
             </div>
           ))}
         </CardContent>
