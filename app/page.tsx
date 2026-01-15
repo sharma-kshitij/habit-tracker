@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -6,8 +8,6 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -15,8 +15,18 @@ import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
 import { Flame, BarChart3 } from "lucide-react";
 import Header from "@/components/header/Header";
+import Today from "@/components/today/Today";
+import { habitsAtom } from "@/components/state/state";
+import { useAtomValue } from "jotai";
+import { calculateCompletionPercentage } from "@/utils/utils";
+import { useEffect, useState } from "react";
 
 export default function HabitTrackerHighFidelity() {
+  const habits = useAtomValue(habitsAtom);
+  const [completedPercent, setCompletedPercent] = useState(0);
+  useEffect(() => {
+    setCompletedPercent(calculateCompletionPercentage(habits));
+  }, [habits]);
   return (
     <div className="min-h-screen bg-muted/40 p-6">
       <div className="max-w-6xl mx-auto space-y-6">
@@ -27,17 +37,17 @@ export default function HabitTrackerHighFidelity() {
           <Card className="shadow-sm">
             <CardHeader>
               <CardDescription>Today's Completion</CardDescription>
-              <CardTitle>60%</CardTitle>
+              <CardTitle>{completedPercent}</CardTitle>
             </CardHeader>
             <CardContent>
-              <Progress value={60} />
+              <Progress value={completedPercent} />
             </CardContent>
           </Card>
 
           <Card className="shadow-sm">
             <CardHeader>
               <CardDescription>Active Habits</CardDescription>
-              <CardTitle>5</CardTitle>
+              <CardTitle>{habits.length}</CardTitle>
             </CardHeader>
             <CardContent>
               <Badge variant="secondary">On Track</Badge>
@@ -64,35 +74,7 @@ export default function HabitTrackerHighFidelity() {
           </TabsList>
 
           {/* Today Tab */}
-          <TabsContent value="today" className="space-y-4">
-            <Card className="shadow-sm">
-              <CardHeader>
-                <CardTitle>Today's Habits</CardTitle>
-                <CardDescription>
-                  Mark habits as you complete them
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {["Exercise", "Read 20 mins", "Drink 3L Water", "Meditate"].map(
-                  (habit, index) => (
-                    <div
-                      key={habit}
-                      className="flex items-center justify-between rounded-lg border p-3 hover:bg-muted transition"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Checkbox />
-                        <span className="font-medium">{habit}</span>
-                        {index === 0 && <Badge>Daily</Badge>}
-                      </div>
-                      <Button size="sm" variant="ghost">
-                        Edit
-                      </Button>
-                    </div>
-                  )
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+          <Today />
 
           {/* Calendar Tab */}
           <TabsContent value="calendar">

@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Moon, Plus, Sun } from "lucide-react";
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
@@ -24,14 +22,14 @@ import {
 } from "@/components/ui/field";
 import { Input } from "../ui/input";
 import { useTheme } from "next-themes";
-import { useEffect } from "react";
+import { useState } from "react";
+import { useSetAtom } from "jotai";
+import { habitsAtom } from "../state/state";
 
 const Header = () => {
   const { theme, setTheme } = useTheme();
-
-  useEffect(() => {
-    console.log(theme);
-  }, []);
+  const [habit, setHabit] = useState("");
+  const setHabits = useSetAtom(habitsAtom);
 
   return (
     <Card className="shadow-sm">
@@ -41,19 +39,6 @@ const Header = () => {
           <CardDescription>
             Build consistency, one day at a time
           </CardDescription>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Sun className="h-4 w-4" />
-            <Switch
-              checked={theme === "dark"}
-              onCheckedChange={(v) => setTheme(v ? "dark" : "light")}
-            />
-            <Moon className="h-4 w-4" />
-          </div>
-          <Avatar>
-            <AvatarFallback>KS</AvatarFallback>
-          </Avatar>
           <Drawer>
             <DrawerTrigger asChild>
               <Button>
@@ -73,6 +58,10 @@ const Header = () => {
                         id="habit-name"
                         autoComplete="off"
                         placeholder="Drink Water"
+                        value={habit}
+                        onChange={(e) => {
+                          setHabit(e.target.value);
+                        }}
                       />
                       <FieldDescription>
                         {/* Optional helper text. */}
@@ -82,7 +71,17 @@ const Header = () => {
                   </DrawerDescription>
                 </DrawerHeader>
                 <DrawerFooter>
-                  <Button>Submit</Button>
+                  <Button
+                    onClick={() => {
+                      setHabits((prev) => [
+                        ...prev,
+                        { id: prev.length + 1, name: habit, completed: false },
+                      ]);
+                      setHabit("");
+                    }}
+                  >
+                    Submit
+                  </Button>
                   <DrawerClose asChild>
                     <Button variant="outline">Cancel</Button>
                   </DrawerClose>
@@ -90,6 +89,18 @@ const Header = () => {
               </div>
             </DrawerContent>
           </Drawer>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            {theme == "dark" ? (
+              <Sun onClick={() => setTheme("light")} className="h-4 w-4" />
+            ) : (
+              <Moon onClick={() => setTheme("dark")} className="h-4 w-4" />
+            )}
+          </div>
+          <Avatar>
+            <AvatarFallback>KS</AvatarFallback>
+          </Avatar>
         </div>
       </CardHeader>
     </Card>
