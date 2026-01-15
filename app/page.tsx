@@ -50,7 +50,12 @@ export default function HabitTrackerHighFidelity() {
               <CardTitle>{habits.length}</CardTitle>
             </CardHeader>
             <CardContent>
-              <Badge variant="secondary">On Track</Badge>
+              <Badge
+                className="bg-green-700 flex items-center justify-center text-white"
+                variant="secondary"
+              >
+                On Track
+              </Badge>
             </CardContent>
           </Card>
 

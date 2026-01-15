@@ -30,6 +30,21 @@ const Header = () => {
   const { theme, setTheme } = useTheme();
   const [habit, setHabit] = useState("");
   const setHabits = useSetAtom(habitsAtom);
+  const [open, setOpen] = useState(false);
+  const [alert, setAlert] = useState("");
+
+  const submit = () => {
+    if (habit.trim() === "") {
+      setAlert("Habit cannot be empty");
+      return;
+    }
+    setHabits((prev) => [
+      ...prev,
+      { id: prev[prev.length - 1].id + 1, name: habit, completed: false },
+    ]);
+    setHabit("");
+    setOpen(false);
+  };
 
   return (
     <Card className="shadow-sm">
@@ -39,7 +54,7 @@ const Header = () => {
           <CardDescription>
             Build consistency, one day at a time
           </CardDescription>
-          <Drawer>
+          <Drawer open={open} onOpenChange={setOpen}>
             <DrawerTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" /> Add Habit
@@ -66,22 +81,12 @@ const Header = () => {
                       <FieldDescription>
                         {/* Optional helper text. */}
                       </FieldDescription>
-                      <FieldError>{/* Validation message. */}</FieldError>
+                      <FieldError>{alert}</FieldError>
                     </Field>
                   </DrawerDescription>
                 </DrawerHeader>
                 <DrawerFooter>
-                  <Button
-                    onClick={() => {
-                      setHabits((prev) => [
-                        ...prev,
-                        { id: prev.length + 1, name: habit, completed: false },
-                      ]);
-                      setHabit("");
-                    }}
-                  >
-                    Submit
-                  </Button>
+                  <Button onClick={() => submit()}>Submit</Button>
                   <DrawerClose asChild>
                     <Button variant="outline">Cancel</Button>
                   </DrawerClose>
@@ -92,10 +97,20 @@ const Header = () => {
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            {theme == "dark" ? (
-              <Sun onClick={() => setTheme("light")} className="h-4 w-4" />
+            {theme === "light" ? (
+              <Sun
+                onClick={() => {
+                  setTheme("dark");
+                }}
+                className="h-4 w-4"
+              />
             ) : (
-              <Moon onClick={() => setTheme("dark")} className="h-4 w-4" />
+              <Moon
+                onClick={() => {
+                  setTheme("light");
+                }}
+                className="h-4 w-4"
+              />
             )}
           </div>
           <Avatar>
