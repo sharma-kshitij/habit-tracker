@@ -4,3 +4,4 @@ export interface habitType {
   daily: boolean;
   completed: boolean;
 }
+

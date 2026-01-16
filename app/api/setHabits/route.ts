@@ -16,14 +16,14 @@ export const POST = async (request: Request) => {
     const body = await request.json();
 
     // Extract the email variable from req.body
-    const { email } = body;
-    const habits = await client
+    const { email, habits } = body;
+    const result = await client
       .db("habits-tracker")
       .collection("habits")
-      .findOne({ email: email });
+      .updateOne({ email: email }, { $set: { habits: habits } });
     // Parse the JSON body from the request
-    console.log(habits);
-    return NextResponse.json({ habits });
+
+    return NextResponse.json({ success: true });
   } catch (e) {
     console.log(e);
     return NextResponse.json({ success: false });

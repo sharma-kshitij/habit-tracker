@@ -1,3 +1,4 @@
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { TabsContent } from "@/components/ui/tabs";
@@ -12,11 +13,9 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
-  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from "@/components/ui/drawer";
 import {
   Field,
@@ -33,12 +32,14 @@ import { Plus } from "lucide-react";
 import { Input } from "../ui/input";
 import { habitType } from "../types/types";
 import { Switch } from "@/components/ui/switch";
+import { Spinner } from "../ui/spinner";
 
 const Today = () => {
   const [habits, setHabits] = useAtom(habitsAtom);
   const [open, setOpen] = useState(false);
   const [alert, setAlert] = useState("");
   const [editHabit, setEditHabit] = useState<habitType>();
+  const [loading, setLoading] = useState(true);
 
   const submit = () => {
     console.log(editHabit);
@@ -56,11 +57,33 @@ const Today = () => {
     setOpen(false);
   };
 
+  const getTodaysHabits = async () => {
+    const habitsForToday = await axios.post("/api/getHabits", {
+      email: "sharmakshitij250@gmail.com",
+    });
+    console.log(habitsForToday.data.habits);
+    setHabits(habitsForToday.data.habits.habits);
+    setLoading(false);
+  };
+
+  const setTodaysHabits = async (habits: habitType[]) => {
+    const res = await axios.post("/api/setHabits", {
+      email: "sharmakshitij250@gmail.com",
+      habits: habits,
+    });
+
+    console.log(res.data);
+  };
+
   useEffect(() => {
     if (editHabit?.name.trim() !== "") {
       setAlert("");
     }
   }, [editHabit]);
+
+  useEffect(() => {
+    getTodaysHabits();
+  }, []);
 
   return (
     <TabsContent value="today" className="space-y-4">
@@ -98,7 +121,10 @@ const Today = () => {
                   id="daily"
                   checked={editHabit?.daily}
                   onCheckedChange={() =>
-                    setEditHabit({ ...editHabit, daily: !editHabit?.daily } as habitType)
+                    setEditHabit({
+                      ...editHabit,
+                      daily: !editHabit?.daily,
+                    } as habitType)
                   }
                 />
               </Field>
@@ -114,7 +140,10 @@ const Today = () => {
       </Drawer>
       <Card className="shadow-sm">
         <CardHeader>
-          <CardTitle>Today's Habits</CardTitle>
+          <CardTitle className="flex justify-between">
+            <div>Today's Habits</div>
+            {loading && <Spinner />}
+          </CardTitle>
           <CardDescription>Mark habits as you complete them</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">

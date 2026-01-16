@@ -1,0 +1,6 @@
+[
+  { "id": 1, "name": "Exercise", "completed": false, "daily": true },
+  { "id": 2, "name": "Read 20 mins", "completed": false, "daily": false },
+  { "id": 3, "name": "Drink 3L Water", "completed": false, "daily": true },
+  { "id": 4, "name": "Meditate", "completed": false, "daily": true }
+]
